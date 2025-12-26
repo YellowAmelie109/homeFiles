@@ -15,7 +15,7 @@ def check_access(dir):
             audio=EasyID3(dire)
             audio.save()
     except:
-        print(name, "cannot be accessed. Fix this before using this tool")
+        print(name, "cannot be accessed. Fix this before using this tool\n")
         return False
     
     return True
@@ -30,11 +30,11 @@ def del_track_from_dir(PATH, targetdir):
         os.remove(targetdir)
 
         try:
-            file = open("deletedTracks.txt", "w")
-            file.write(str(targetnum)+": "+targetdir[len(PATH)+1:-4])
+            file = open("deletedTracks.txt", "a")
+            file.write(str(targetnum)+": "+targetdir[len(PATH)+1:-4]+'\n')
             file.close()
-        except:
-            print(str(targetnum)+": "+targetdir[len(PATH)+1:-4])
+        finally:
+            print("Deleted num "+str(targetnum)+": "+targetdir[len(PATH)+1:-4]+'\n')
 
         for name in os.listdir(PATH):
             if name[-3:]=="mp3":
@@ -44,7 +44,7 @@ def del_track_from_dir(PATH, targetdir):
                 if  tracknum > targetnum:
                     audio["tracknumber"] = str(tracknum - 1)
                     audio.save()
-        verify(PATH)
+    return allowed
 
 def verify(PATH):
     allowed = check_access(PATH)
@@ -57,18 +57,28 @@ def verify(PATH):
                 tracknum=int(audio["tracknumber"][0])
                 if tracknum in numCount:
                     numCount[tracknum]+=1
-                    print(tracknum, "has been repeated. An error has occured")
+                    print(tracknum, "has been repeated. An error has occured\n")
                 else:
                     numCount[tracknum]=1
         for i in range(1,max(numCount)+1):
             if i not in numCount:
-                print(i, "has not been used as a track number. An error has occured")
-    print("Verification complete")
+                print(i, "has not been used as a track number. An error has occured\n")
+    print("Verification complete\n")
 
 if __name__ == "__main__":
     from tkinter import filedialog, Tk
-    PATH = "C:/Users/ameli/Music/Yes!" #Change to the folder the song you want to remove is saved in. I could change this to another tkinter UI if that would be easier
+    PATH = "" #Change to the folder the song you want to remove is saved in. I could change this to another tkinter UI if that would be easier
     Tk().withdraw()
-    dir = filedialog.askopenfilename(initialdir=PATH,filetypes=[("MP3 files", ".mp3")])
-    if PATH in dir:
-        del_track_from_dir(PATH,dir)
+    dir = filedialog.askopenfilenames(initialdir=PATH,filetypes=[("MP3 files", ".mp3")])
+    needsVerification=False
+    if len(dir)>0:
+        print()
+        for track in dir:
+            if PATH in track:
+                deleted=del_track_from_dir(PATH,track)
+                if not needsVerification and deleted:
+                    needsVerification = True
+            else:
+                print("Change the PATH constant to select a different folder\n")
+        if needsVerification:
+            verify(PATH)
