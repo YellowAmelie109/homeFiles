@@ -12,7 +12,7 @@ def audio_duration(length):
     return hours, mins, seconds
 
 if __name__ == "__main__":
-    PATH = "C:/Users/ameli/Music/Yes!"
+    PATH = "/home/amelie/Music/Yes!/"
     length=0
     for name in os.listdir(PATH):
         if name[-3:]=="mp3":
@@ -20,4 +20,8 @@ if __name__ == "__main__":
             audio=MP3(dire)
             length+=audio.info.length
     hours, mins, seconds = audio_duration(length)
+    if mins <10:
+        mins="0"+str(mins)
+    if seconds<10:
+        seconds="0"+str(seconds)
     print('Total Duration: {}:{}:{}'.format(hours, mins, seconds))

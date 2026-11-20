@@ -1,6 +1,3 @@
-#ALL FILE NAMES MUST ENTIRELY USE ENGLISH CHARACETERS TO WORK (numbers and symbols are ok). (it might just be that the starting char must be in the english alphabet but remove all foreign characters to be sure).
-#IF ^ ISN'T DONE THE TRACKS WILL BE MOVED OUT OF ORDER WITH NO ERROR MESSAGE OR WARNING
-
 #CHANGE THE PATH CONSTANT AT THE BOTTOM BEFORE RUNNING
 
 #If you think something is currently wrong with your tracknums, run the verify(PATH) subroutine, with PATH being the folder that contains the bad track numbers. It will print any errors to the terminal.
@@ -11,9 +8,10 @@ import os
 def check_access(dir):
     try:
         for name in os.listdir(dir):
-            dire=dir+"/"+name
-            audio=EasyID3(dire)
-            audio.save()
+            if name[-3:]=="mp3":
+                dire=dir+"/"+name
+                audio=EasyID3(dire)
+                audio.save()
     except:
         print(name, "cannot be accessed. Fix this before using this tool\n")
         return False
@@ -31,10 +29,10 @@ def del_track_from_dir(PATH, targetdir):
 
         try:
             file = open("deletedTracks.txt", "a")
-            file.write(str(targetnum)+": "+targetdir[len(PATH)+1:-4]+'\n')
+            file.write(str(targetnum)+": "+targetdir[len(PATH):-4]+'\n')
             file.close()
         finally:
-            print("Deleted num "+str(targetnum)+": "+targetdir[len(PATH)+1:-4]+'\n')
+            print("Deleted num "+str(targetnum)+": "+targetdir[len(PATH):-4]+'\n')
 
         for name in os.listdir(PATH):
             if name[-3:]=="mp3":
@@ -67,7 +65,7 @@ def verify(PATH):
 
 if __name__ == "__main__":
     from tkinter import filedialog, Tk
-    PATH = "" #Change to the folder the song you want to remove is saved in. I could change this to another tkinter UI if that would be easier
+    PATH = "/home/amelie/Music/Yes!/" #Change to the folder the song you want to remove is saved in. I could change this to another tkinter UI if that would be easier
     Tk().withdraw()
     dir = filedialog.askopenfilenames(initialdir=PATH,filetypes=[("MP3 files", ".mp3")])
     needsVerification=False
@@ -79,6 +77,7 @@ if __name__ == "__main__":
                 if not needsVerification and deleted:
                     needsVerification = True
             else:
+                print(track,PATH)
                 print("Change the PATH constant to select a different folder\n")
         if needsVerification:
             verify(PATH)
